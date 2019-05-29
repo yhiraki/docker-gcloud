@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MOUNT_OPTIONS=
+MOUNT_OPTIONS="-v $(pwd):/pwd"
 
 for arg in "$@"
 do
@@ -23,6 +23,7 @@ exec docker run \
   $MOUNT_OPTIONS \
   -e TERM \
   -e USER \
+  -w /pwd \
   -it \
   google/cloud-sdk:alpine \
   $*
