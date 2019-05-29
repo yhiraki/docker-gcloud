@@ -1,19 +1,18 @@
 #!/bin/bash
 
 MOUNT_OPTIONS="-v $(pwd):/pwd"
+NEW_ARGS=
 
 for arg in "$@"
 do
-  if (echo $arg | grep -v '/' > /dev/null)
+  path=$(realpath "$arg" 2> /dev/null)
+  if [ -n "$path" ] && (echo $arg | grep '/' > /dev/null)
   then
-    dname="$arg"
+    NEW_ARGS="$NEW_ARGS $path"
+    [ -d "$path" ] || path=$(dirname $path)
+    MOUNT_OPTIONS="-v $path:$path $MOUNT_OPTIONS"
   else
-    arg=$(realpath "$arg" 2> /dev/null)
-    [ -n "$arg" ] && dname=$(dirname "$arg")
-  fi
-  if [ -d $dname ]
-  then
-    MOUNT_OPTIONS="-v $dname:$dname $MOUNT_OPTIONS"
+    NEW_ARGS="$NEW_ARGS $arg"
   fi
 done
 
@@ -27,4 +26,4 @@ exec docker run \
   -w /pwd \
   -it \
   google/cloud-sdk:alpine \
-  $*
+  $NEW_ARGS
