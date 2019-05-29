@@ -8,7 +8,8 @@ do
   then
     dname="$arg"
   else
-    dname=$(dirname "$arg")
+    arg=$(realpath "$arg" 2> /dev/null)
+    [ -n "$arg" ] && dname=$(dirname "$arg")
   fi
   if [ -d $dname ]
   then
